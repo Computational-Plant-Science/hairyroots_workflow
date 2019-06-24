@@ -57,4 +57,4 @@ def process_sample(name,current_path,args):
     
     
     
-    return {'files':[ current_path + 'hairyroots_result.csv' ]}
+    return {'files':[ current_path + '/hairyroots_result.csv' ]}
