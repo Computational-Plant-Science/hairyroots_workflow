@@ -41,7 +41,7 @@ def process_sample(name,current_path,args):
     
     #python /opt/code/RootHairClean.py -p /work/akblab/vsm/hairyroot/
     
-        cmd_line = "python /opt/code/RootHairClean.py -p " + current_path 
+        cmd_line = "python /opt/code/RootHairClean.py -p " + current_path + "/"
     
         #print(cmd_line)
         
