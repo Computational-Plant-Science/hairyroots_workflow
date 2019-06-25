@@ -13,12 +13,12 @@ def parse_group(group):
     '''
     dict = {}
 
-    if 'params' in group.keys():
+    if 'params' in group.keys() and group['params']:
         p = {}
         for param in group['params']:
             p[param['id']] = param['initial']
         dict['params'] = p
-    if 'groups' in group.keys():
+    if 'groups' in group.keys() and group['group']:
         dict['groups'] = {}
         for g in group['groups']:
             dict['groups'][g['id']] = parse_group(g)
@@ -78,9 +78,13 @@ def check_group_format(group):
     assert 'name' in group.keys()
 
     if 'params' in group.keys():
+        assert group['params'] != [], "Params must not be empty, remove params from %s if not needed."%(group['name'],)
+
         for param in group['params']:
             check_param_format(param)
 
     if 'groups' in group.keys():
+        assert group['groups'] != [], "groups must not be empty, Remove group from %s if not needed."%(group['name'])
+
         for g in group['groups']:
             check_group_format(g)

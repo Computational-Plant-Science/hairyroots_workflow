@@ -37,17 +37,4 @@ WORKFLOW_CONFIG = {
 
 #Defines the arguments that are passed to process_sample.
 #See docs for more details
-parameters = [
-    {
-        #unique group name, must be a valid python variable name
-        'id': 'settings',
-
-        #Human readable name, shown in website UI
-        'name': 'Settings',
-
-        #A list of parameters within this group. These are converted to
-        # fields in the website UI. Each parameter is represented by a
-        # python dictionary.
-        'params':[]
-    }
-]
+parameters = []

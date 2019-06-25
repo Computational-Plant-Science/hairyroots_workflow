@@ -35,7 +35,6 @@ def process_sample(name,current_path,args):
 
                 Files names do not need to be unique between samples.
     '''
-    settings = args['settings']['params']
 
     #python /opt/code/RootHairClean.py -p /work/akblab/vsm/hairyroot/
 

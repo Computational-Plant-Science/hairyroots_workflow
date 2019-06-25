@@ -116,7 +116,7 @@ def test_process_sample(tmp_path,fake_args):
     try:
         mkdir(results_folder)
     except FileExistsError:
-        shutil.rmtree(src)
+        shutil.rmtree(results_folder)
         mkdir(results_folder)
         pass
 
