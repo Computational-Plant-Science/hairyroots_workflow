@@ -36,26 +36,11 @@ def process_sample(name,current_path,args):
                 Files names do not need to be unique between samples.
     '''
     settings = args['settings']['params']
-    
-    try:
-    
+
     #python /opt/code/RootHairClean.py -p /work/akblab/vsm/hairyroot/
-    
-        cmd_line = "python /opt/code/RootHairClean.py -p " + current_path + "/"
-    
-        #print(cmd_line)
-        
-        process = subprocess.Popen(cmd_line, shell = True, stdout = subprocess.PIPE)
-        
-        process.wait()
-        
-        #print process.returncode
-        
-    except OSError:
-        
-        print("Failed ...!\n")
-    
-    
-    
+
+    cmd_line = "python /opt/code/RootHairClean.py -p " + current_path + "/"
+
+    subprocess.run(cmd_line, shell = True, check = True, stdout = subprocess.PIPE)
+
     return {'files':[ current_path + '/hairyroots_result.csv' ]}
-    

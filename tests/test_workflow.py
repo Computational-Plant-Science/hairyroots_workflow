@@ -4,7 +4,7 @@
     * correct formatting and values in WORKFLOW_CONFIG
     * correct foramtting and values in workflow.parameters
 '''
-from os import getcwd
+from os import getcwd, mkdir
 from os.path import join, isfile, exists
 import shutil, errno
 import json
@@ -110,6 +110,72 @@ def test_process_sample(tmp_path,fake_args):
 
     results = pickle.load(open(join(tmp_path,'results.pkl'),'rb'))
 
+    assert isinstance(results,dict)
+
+    results_folder = "./pytest_test_results"
+    try:
+        mkdir(results_folder)
+    except FileExistsError:
+        shutil.rmtree(src)
+        mkdir(results_folder)
+        pass
+
+    #Copy output files to a local directory for visual inspection
     #More advanced testing of results could be performed by inspecting the
     #data in results. This is left to the workflow developer (you).
-    assert isinstance(results,dict)
+    if 'files' in results:
+        for file in results['files']:
+            shutil.move(join(tmp_path,file),results_folder)
+    if 'key-val' in results:
+        with open(join(results_folder,'key-val.json'),'w') as fout:
+            fout.write(json.dumps(results['key-val']))
+
+def test_process_sample_fail(tmp_path,fake_args):
+    '''
+        Test that an error message is thrown if process_sample fails.
+
+        The fail state is providing a sample path that does not exist.
+
+        This test passes if:
+         * process_sample completes with a run code != 0
+           This can happen by either calling `exit(1)` within the
+           process_sample function, or by throwing a python exception.
+    '''
+    from workflow import WORKFLOW_CONFIG
+
+    sample_name = 'Fake'
+    sample_path = 'does/not/exist/'
+
+    with open(join(tmp_path,'params.json'),'w') as fout:
+        args = {
+            'sample_path': sample_path,
+            'sample_name': sample_name,
+            'args': fake_args
+        }
+        json.dump(args,fout)
+
+    if('pre_commands' in WORKFLOW_CONFIG.keys()):
+        cmd = [s.format(workdir=getcwd()) for s in WORKFLOW_CONFIG['pre_commands']]
+        ret = subprocess.run(cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+
+    extra_flags = [s.format(workdir=getcwd()) for s in WORKFLOW_CONFIG.get('singularity_flags',[])]
+    ret = subprocess.run(["singularity",
+                          "exec"
+                          ] + extra_flags + [
+                          "--containall",
+                          "--home", tmp_path,
+                          "--bind", "%s:/user_code/"%(getcwd()),
+                          "--bind", "%s:/bootstrap_code/"%(join(getcwd(),'tests')),
+                          "--bind", "%s:/results/"%(tmp_path),
+                          WORKFLOW_CONFIG['singularity_url'],
+                          "python3", "/bootstrap_code/bootstrapper.py"
+                         ],
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+
+    print(ret.stdout)
+    print(ret.stderr)
+
+    assert ret.returncode != 0, "process_sample must throw an error if it can not complete successfully."
